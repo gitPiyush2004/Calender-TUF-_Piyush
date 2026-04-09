@@ -1,5 +1,5 @@
 Interactive Wall Calendar
-A premium, interactive calendar component inspired by a physical wall calendar, built with a strong focus on UI/UX, performance, and clean architecture by PIyush Bhatia.
+- A premium, interactive calendar component inspired by a physical wall calendar, built with a strong focus on UI/UX, performance, and clean architecture by Piyush Bhatia.
 
 - Live Demo: https://calender-tuf-piyush.vercel.app
 - Repository: https://github.com/gitPiyush2004/Calender-TUF-_Piyush
