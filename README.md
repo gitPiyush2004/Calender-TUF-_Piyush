@@ -55,20 +55,29 @@ Deployment: Vercel
 
 ##  Project Structure
 
-src/
-├── WallCalendarApp.jsx            
-├── calendar/
-│   ├── data.js                    
-│   └── dateUtils.js               
-├── components/
-│   └── calendar/
-│       ├── DayCell.jsx            
-│       ├── NotesArea.jsx          
-│       ├── Spirals.jsx            
-│       └── YearView.jsx           
-├── hooks/
-│   └── useHeroImage.js            
-└── main.jsx                       
+
+```
+├── src/                        → Application source code
+│   ├── WallCalendarApp.jsx     → Root component — wires together all panels
+│   ├── calendar/
+│   │   ├── data.js             → Static data: holidays & month themes
+│   │   └── dateUtils.js        → Date helper functions (range checks, formatting)
+│   ├── components/
+│   │   └── calendar/
+│   │       ├── DayCell.jsx     → Day cell with start / end / in-range / today states
+│   │       ├── NotesArea.jsx   → Notes editor keyed by selected date range
+│   │       ├── Spirals.jsx     → Decorative spiral binding (wall calendar aesthetic)
+│   │       └── YearView.jsx    → Full year overview & month-jump navigation
+│   ├── hooks/
+│   │   └── useHeroImage.js     → Month-based hero image selection hook
+│   └── main.jsx                → App entry point
+├── public/                     → Static assets (images, favicon)
+├── index.html                  → HTML shell
+├── package.json
+├── vite.config.js
+└── README.md
+```
+
 
 -----------------------------------------------------------------
 
