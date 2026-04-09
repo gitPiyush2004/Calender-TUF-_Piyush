@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useReducer, useState } from "react";
-import { DAYS, HERO_IMAGES, HERO_IMAGE_FALLBACKS, MONTHS, THEMES } from "./calendar/data";
+import { DAYS, HERO_IMAGES, HERO_IMAGE_FALLBACKS, HOLIDAYS, MONTHS, THEMES } from "./calendar/data";
 import { daysInMonth, firstWeekdayMondayStart } from "./calendar/dateUtils";
 import { useHeroImage } from "./hooks/useHeroImage";
 import { DayCell } from "./components/calendar/DayCell";
@@ -145,8 +145,23 @@ export default function WallCalendarApp() {
       ? Math.abs(Math.ceil((rangeState.end - rangeState.start) / 86400000)) + 1
       : 0;
 
+  const holidayEntries = useMemo(() => {
+    const monthKey = String(currentMonth + 1).padStart(2, "0");
+    return Object.entries(HOLIDAYS)
+      .filter(([key]) => key.startsWith(`${monthKey}-`))
+      .sort(([a], [b]) => Number(a.split("-")[1]) - Number(b.split("-")[1]));
+  }, [currentMonth]);
+
+  const getHolidayForDay = useCallback(
+    (day) => {
+      const key = `${String(currentMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+      return HOLIDAYS[key] || null;
+    },
+    [currentMonth],
+  );
+
   return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "24px 16px", fontFamily: "'DM Sans', sans-serif", background: ui.pageBg }}>
+    <div className="calendar-root" style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "24px 16px", fontFamily: "'DM Sans', sans-serif", background: ui.pageBg }}>
       <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
       <style>{`
         @keyframes cfOut{0%{transform:perspective(1400px) rotateX(0);opacity:1}100%{transform:perspective(1400px) rotateX(-88deg);opacity:0;transform-origin:top}}
@@ -160,8 +175,34 @@ export default function WallCalendarApp() {
         .calendar-shell{display:flex;flex-direction:row}
         .hero-pane{width:44%;min-height:580px}
         .grid-pane{flex:1}
-        .nav-btn{background:none;border:none;cursor:pointer;font-size:20px;padding:4px 6px;border-radius:8px;line-height:1;transition:all 0.15s}
-        @media(max-width:880px){.calendar-shell{flex-direction:column!important}.hero-pane{width:100%!important;min-height:260px!important;height:260px!important}.grid-pane{width:100%!important}}
+        .nav-btn{background:none;border:none;cursor:pointer;font-size:20px;min-width:40px;min-height:40px;padding:6px 8px;border-radius:10px;line-height:1;transition:all 0.15s;touch-action:manipulation}
+        .header-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;gap:10px}
+        .header-main{min-width:0}
+        .header-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+        .action-btn{border:none;border-radius:10px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;cursor:pointer;touch-action:manipulation;min-height:38px}
+        .month-title{font-size:20px}
+        .calendar-divider{height:1px;margin:10px 0}
+        .selection-bar{display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding:9px 12px;border-radius:10px;font-size:11px;gap:8px}
+        .holiday-strip{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+        .holiday-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 8px;border-radius:999px;font-size:10px;font-weight:600}
+        @media(max-width:1040px){.hero-pane{min-height:500px}}
+        @media(max-width:880px){
+          .calendar-root{padding:86px 10px 12px}
+          .calendar-shell{flex-direction:column!important}
+          .hero-pane{width:100%!important;min-height:250px!important;height:250px!important}
+          .grid-pane{width:100%!important;padding:14px 12px 14px!important}
+          .month-title{font-size:18px}
+        }
+        @media(max-width:540px){
+          .calendar-root{padding:82px 8px 10px}
+          .hero-pane{min-height:215px!important;height:215px!important}
+          .header-row{flex-direction:column;align-items:stretch;gap:8px}
+          .header-actions{justify-content:stretch}
+          .action-btn{flex:1}
+          .day-header{font-size:8px!important;letter-spacing:0.8px!important}
+          .selection-bar{flex-direction:column;align-items:flex-start}
+          .selection-clear{align-self:flex-end}
+        }
         @media (prefers-reduced-motion: reduce) {
           * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
         }
@@ -172,7 +213,7 @@ export default function WallCalendarApp() {
         aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
         title={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
         style={{
-          position: "fixed", top: "16px", right: "16px", zIndex: 80, border: ui.glassBtnBorder, borderRadius: "999px", padding: "8px 12px",
+          position: "fixed", top: "max(12px, env(safe-area-inset-top))", right: "max(10px, env(safe-area-inset-right))", zIndex: 80, border: ui.glassBtnBorder, borderRadius: "999px", padding: "9px 13px",
           background: ui.glassBtnBg, color: isDarkMode ? "#F7FBFF" : "#21252E", backdropFilter: "blur(12px)", cursor: "pointer",
           fontSize: "13px", fontWeight: "700", letterSpacing: "0.4px", boxShadow: isDarkMode ? "0 10px 30px rgba(0,0,0,0.38)" : "0 10px 30px rgba(0,0,0,0.18)",
         }}
@@ -206,35 +247,66 @@ export default function WallCalendarApp() {
           <div className="grid-pane" style={{ padding: "22px 26px 18px", display: "flex", flexDirection: "column", position: "relative", overflow: "hidden" }}>
             {isYearViewOpen && <YearView year={currentYear} currentMonth={currentMonth} theme={theme} darkMode={isDarkMode} onPick={jumpToMonth} onClose={() => setIsYearViewOpen(false)} />}
 
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
-              <div>
+            <div className="header-row">
+              <div className="header-main">
                 <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "9px", fontWeight: "700", color: theme.accent, letterSpacing: "1.8px", textTransform: "uppercase", marginBottom: "1px" }}>Exploring</div>
                 <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                   <button className="nav-btn" onClick={() => navigateMonth("prev")} style={{ color: theme.accent }} aria-label="Previous month">‹</button>
-                  <span style={{ fontFamily: "'Playfair Display', serif", fontSize: "20px", fontWeight: "600", color: ui.panelText }}>{MONTHS[currentMonth]} {currentYear}</span>
+                  <span className="month-title" style={{ fontFamily: "'Playfair Display', serif", fontWeight: "600", color: ui.panelText }}>{MONTHS[currentMonth]} {currentYear}</span>
                   <button className="nav-btn" onClick={() => navigateMonth("next")} style={{ color: theme.accent }} aria-label="Next month">›</button>
                 </div>
                 <div style={{ marginTop: "2px", color: ui.mutedText, fontFamily: "'Playfair Display', serif", fontStyle: "italic", fontSize: "12px", letterSpacing: "0.2px" }}>A precise planner for focused work</div>
               </div>
 
-              <div style={{ display: "flex", gap: "5px" }}>
-                <button onClick={goToToday} style={{ background: theme.light, border: "none", borderRadius: "8px", padding: "5px 11px", fontFamily: "'DM Sans', sans-serif", fontSize: "10px", fontWeight: "600", color: theme.accent, cursor: "pointer" }}>Today</button>
-                <button onClick={() => setIsYearViewOpen((v) => !v)} style={{ background: theme.accent, border: "none", borderRadius: "8px", padding: "5px 11px", fontFamily: "'DM Sans', sans-serif", fontSize: "10px", fontWeight: "600", color: "#fff", cursor: "pointer" }}>📅 Year</button>
+              <div className="header-actions">
+                <button className="action-btn" onClick={goToToday} style={{ background: theme.light, color: theme.accent }}>Today</button>
+                <button className="action-btn" onClick={() => setIsYearViewOpen((v) => !v)} style={{ background: theme.accent, color: "#fff" }}>📅 Year</button>
               </div>
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: "1px", marginBottom: "4px" }}>
               {DAYS.map((day, index) => (
-                <div key={day} style={{ textAlign: "center", fontFamily: "'DM Sans', sans-serif", fontSize: "9px", fontWeight: "700", color: index >= 5 ? theme.accent : ui.faintText, letterSpacing: "1.2px", padding: "3px 0" }}>{day}</div>
+                <div className="day-header" key={day} style={{ textAlign: "center", fontFamily: "'DM Sans', sans-serif", fontSize: "9px", fontWeight: "700", color: index >= 5 ? theme.accent : ui.faintText, letterSpacing: "1.2px", padding: "3px 0" }}>{day}</div>
               ))}
             </div>
+
+            {holidayEntries.length > 0 && (
+              <div className="holiday-strip">
+                {holidayEntries.map(([key, label]) => (
+                  <span
+                    key={key}
+                    className="holiday-chip"
+                    style={{
+                      background: `${theme.light}CC`,
+                      color: theme.accent,
+                      border: `1px solid ${theme.mid}50`,
+                    }}
+                  >
+                    <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#E04B4B" }} />
+                    {key.split("-")[1]} {label}
+                  </span>
+                ))}
+              </div>
+            )}
 
             <div style={{ animation: flipAnimation, transformStyle: "preserve-3d" }}>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: "1px" }}>
                 {grid.map((cell, index) => (
                   <div key={`${currentMonth}-${currentYear}-${index}`} style={{ opacity: cell.current ? 1 : 0.22 }}>
                     {cell.current ? (
-                      <DayCell day={cell.day} month={currentMonth} year={currentYear} start={rangeState.start} end={rangeState.end} hover={rangeState.hover} clicks={rangeState.clicks} theme={theme} onClick={(date) => dispatchRange({ type: "click", date })} onHover={(date) => dispatchRange({ type: "hover", date })} />
+                      <DayCell
+                        day={cell.day}
+                        month={currentMonth}
+                        year={currentYear}
+                        start={rangeState.start}
+                        end={rangeState.end}
+                        hover={rangeState.hover}
+                        clicks={rangeState.clicks}
+                        theme={theme}
+                        holidayName={getHolidayForDay(cell.day)}
+                        onClick={(date) => dispatchRange({ type: "click", date })}
+                        onHover={(date) => dispatchRange({ type: "hover", date })}
+                      />
                     ) : (
                       <div style={{ width: "100%", aspectRatio: "1", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "13px", color: ui.altCell, fontFamily: "'DM Sans', sans-serif" }}>{cell.day}</div>
                     )}
@@ -244,16 +316,17 @@ export default function WallCalendarApp() {
             </div>
 
             {rangeState.start && (
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "8px", padding: "7px 12px", background: `${theme.light}90`, borderRadius: "8px", fontSize: "10.5px", color: ui.mutedText, fontFamily: "'DM Sans', sans-serif" }}>
+              <div className="selection-bar" style={{ background: `${theme.light}90`, color: ui.mutedText, fontFamily: "'DM Sans', sans-serif" }}>
                 <span>
                   {rangeState.start.getDate()} {MONTHS[rangeState.start.getMonth()].slice(0, 3)}
                   {rangeState.end && ` → ${rangeState.end.getDate()} ${MONTHS[rangeState.end.getMonth()].slice(0, 3)} · ${selectedRangeDays} day${selectedRangeDays > 1 ? "s" : ""}`}
+                  {!rangeState.end && getHolidayForDay(rangeState.start.getDate()) && ` · ${getHolidayForDay(rangeState.start.getDate())}`}
                 </span>
-                <button onClick={() => dispatchRange({ type: "clear" })} style={{ background: "none", border: "none", color: theme.accent, cursor: "pointer", fontSize: "10.5px", fontWeight: "600", fontFamily: "'DM Sans', sans-serif" }}>Clear</button>
+                <button className="selection-clear" onClick={() => dispatchRange({ type: "clear" })} style={{ background: "none", border: "none", color: theme.accent, cursor: "pointer", fontSize: "10.5px", fontWeight: "600", fontFamily: "'DM Sans', sans-serif", minHeight: "34px", minWidth: "56px" }}>Clear</button>
               </div>
             )}
 
-            <div style={{ height: "1px", margin: "10px 0", background: `linear-gradient(90deg, transparent, ${theme.mid}30, transparent)` }} />
+            <div className="calendar-divider" style={{ background: `linear-gradient(90deg, transparent, ${theme.mid}30, transparent)` }} />
 
             <NotesArea month={currentMonth} year={currentYear} start={rangeState.start} end={rangeState.end} theme={theme} darkMode={isDarkMode} notes={notes} setNotes={setNotes} rangeNotes={rangeNotes} setRangeNotes={setRangeNotes} />
           </div>

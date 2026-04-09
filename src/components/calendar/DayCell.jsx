@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { isBetweenDates, isSameDate, isToday } from "../../calendar/dateUtils";
 
-export function DayCell({ day, month, year, start, end, hover, clicks, theme, onClick, onHover }) {
+export function DayCell({ day, month, year, start, end, hover, clicks, theme, holidayName, onClick, onHover }) {
   const date = useMemo(() => new Date(year, month, day), [year, month, day]);
   const today = isToday(date);
   const isStart = isSameDate(date, start);
@@ -36,7 +36,8 @@ export function DayCell({ day, month, year, start, end, hover, clicks, theme, on
     <button
       onClick={() => onClick(date)}
       onMouseEnter={() => onHover(date)}
-      aria-label={`${day}-${month + 1}-${year}`}
+      aria-label={`${day}-${month + 1}-${year}${holidayName ? `, ${holidayName}` : ""}`}
+      title={holidayName || ""}
       style={{
         width: "100%",
         aspectRatio: "1",
@@ -77,6 +78,20 @@ export function DayCell({ day, month, year, start, end, hover, clicks, theme, on
             height: "4px",
             borderRadius: "50%",
             background: isStart ? "#fff" : theme.accent,
+          }}
+        />
+      )}
+      {holidayName && (
+        <span
+          style={{
+            position: "absolute",
+            top: "3px",
+            right: "3px",
+            width: "6px",
+            height: "6px",
+            borderRadius: "50%",
+            background: "#E04B4B",
+            boxShadow: "0 0 0 1px rgba(255,255,255,0.65)",
           }}
         />
       )}

@@ -49,3 +49,13 @@ export const THEMES = [
   { accent: "#6E5B4B", light: "#F3EFEB", mid: "#A8958A", bg: "#FAF8F6", name: "Dusk Glow" },
   { accent: "#3B6B8C", light: "#E8F0F6", mid: "#7AAAC4", bg: "#F6FAFC", name: "Winter Calm" },
 ];
+
+// Fixed-date holiday markers (MM-DD).
+export const HOLIDAYS = {
+  "01-01": "New Year",
+  "01-26": "Republic Day",
+  "05-01": "Labour Day",
+  "08-15": "Independence Day",
+  "10-02": "Gandhi Jayanti",
+  "12-25": "Christmas",
+};
