@@ -5,51 +5,42 @@ Interactive Wall Calendar
 - Repository: https://github.com/gitPiyush2004/Calender-TUF-_Piyush
   
 ------------------------------------------------------------
-* Features
-- Interactive Calendar
-Fully functional monthly calendar grid
-Accurate date alignment using modern date utilities
-Highlights:
-Current day
-Selected start & end dates
-Range in between
+## Features
 
-- Date Range Selection
-Click once → Start date
-Click again → End date
-Automatically highlights selected range
-Resets intelligently on new selection
+### Core Requirements
+- **Wall Calendar Aesthetic** — Clean, physical wall-calendar-inspired layout with a prominent hero image panel paired alongside the date grid.
+- **Day Range Selector** — Click a start date and an end date; all days in between are highlighted with distinct visual states for start, end, and in-range days.
+- **Integrated Notes Section** — Attach notes to a selected date range or write general monthly memos. Notes persist across navigation using `localStorage`.
+- **Fully Responsive Design** — Desktop shows a side-by-side split panel; mobile stacks all sections vertically with full touch support.
 
-- Notes System
-Add notes for the month
-Persistent storage using localStorage
-Seamless UX with instant updates
-
-- Wall Calendar Aesthetic
-Inspired by real-world hanging calendars
-Hero image with month/year overlay
-Clean typography and visual hierarchy
-
-- Fully Responsive
-Desktop: Split layout (Image + Calendar)
-Mobile: Stacked layout for touch usability
+### Creative Additions 
+- **Month Navigation** — Smoothly navigate forward and backward between months.
+- **Holiday Markers** — Common public holidays are automatically marked on the grid with subtle indicators.
+- **Theme Switching** — The calendar palette adapts based on the current month (e.g., warm tones for summer, cool blues for winter).
+- **Page-Flip Animation** — Month transitions feature a CSS page-flip effect that reinforces the physical calendar feel.
+- **Today Highlight** — The current date is always clearly distinguished.
+- **Notes Persistence** — All notes are saved to `localStorage` so they survive page refreshes.
 
 -----------------------------------------------------------
-- Tech Stack
-Frontend: React (Vite)
-Language: TypeScript
-Styling: Tailwind CSS
-State Management: React Hooks
-Date Handling: date-fns
-Deployment: Vercel
+### Tech Stack
+- Frontend: React (Vite)
+- Language: TypeScript
+- Styling: Tailwind CSS
+- State Management: React Hooks
+- Date Handling: date-fns
+- Deployment: Vercel
 -----------------------------------------------------------
+##  Design Decisions
 
-* Design & Engineering Decisions
--Focused on component-driven architecture for scalability
--Separated logic using custom hooks (useCalendar, useDateRange)
--Used Tailwind for rapid UI iteration and consistency
--Prioritized UX clarity (clear selection states, smooth interactions)
--Designed layout to mimic a physical wall calendar with modern usability
+- **`WallCalendarApp.jsx` as Root:** All state (selected range, active month, notes) lives here and flows down as props, keeping child components focused and easy to test.
+- **`Spirals.jsx` — Physical Calendar Detail:** A dedicated component renders the decorative spiral binding at the top, reinforcing the wall calendar aesthetic without cluttering the layout logic of other components.
+- **`YearView.jsx` — Quick Navigation:** A full year overview lets users jump to any month at a glance, going beyond simple prev/next arrows.
+- **`useHeroImage.js` Hook:** Isolates the logic for pairing each month with a hero image, making it trivial to swap in different image sets or themes later.
+- **`data.js` for Static Content:** Holidays and any other static data are centralized here rather than scattered across components.
+- **Split Panel Layout (Desktop):** The hero image lives in the left panel and the calendar grid + notes occupy the right panel, mirroring a physical wall calendar's photo-above-dates format.
+- **Stacked Layout (Mobile):** The image collapses to a banner strip, followed by the grid, then the notes area — all scrollable in a single column.
+- **Range Selection UX:** Single click sets the start date; a second click on any later date confirms the end. A third click resets the selection. Hovering previews the in-range state before confirming.
+- **No Backend:** `localStorage` is used for all persistence. Notes are keyed by date range so each selection has independent storage.
 
 ------------------------------------------------------------
 
@@ -92,19 +83,19 @@ npm run dev
 5. Open in browser
 http://localhost:5173
 
-** Highlights
-Clean and scalable architecture
-Thoughtful UX with interactive feedback
-Production-ready code structure
-Fully deployed and accessible
 
 -------------------------------------------------------------------
 
--Author
-Piyush Bhatia
-Developer | UI/UX Enthusiast
+## Author
 
-License
+**Piyush Bhatia**
+GitHub: [@gitPiyush2004](https://github.com/gitPiyush2004)
+
+---
+
+## License
+
 This project was built for assessment purposes as part of the TakeUForward internship program.
+
 
 
