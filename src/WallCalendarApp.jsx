@@ -8,6 +8,10 @@ import { Spirals } from "./components/calendar/Spirals";
 import { YearView } from "./components/calendar/YearView";
 
 const initialRange = { start: null, end: null, clicks: 0, hover: null };
+const STORAGE_KEYS = {
+  notes: "tuf-calendar-notes-v1",
+  rangeNotes: "tuf-calendar-range-notes-v1",
+};
 
 function rangeReducer(state, action) {
   switch (action.type) {
@@ -69,6 +73,39 @@ export default function WallCalendarApp() {
     const timer = setTimeout(() => setIsMounted(true), 50);
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    try {
+      const savedNotes = localStorage.getItem(STORAGE_KEYS.notes);
+      const savedRangeNotes = localStorage.getItem(STORAGE_KEYS.rangeNotes);
+      if (savedNotes) {
+        const parsed = JSON.parse(savedNotes);
+        if (parsed && typeof parsed === "object") setNotes(parsed);
+      }
+      if (savedRangeNotes) {
+        const parsed = JSON.parse(savedRangeNotes);
+        if (parsed && typeof parsed === "object") setRangeNotes(parsed);
+      }
+    } catch {
+      // Ignore malformed localStorage payloads and continue with defaults.
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEYS.notes, JSON.stringify(notes));
+    } catch {
+      // Ignore storage write failures (e.g., private mode quota limits).
+    }
+  }, [notes]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEYS.rangeNotes, JSON.stringify(rangeNotes));
+    } catch {
+      // Ignore storage write failures (e.g., private mode quota limits).
+    }
+  }, [rangeNotes]);
 
   const grid = useMemo(() => {
     const cells = [];
